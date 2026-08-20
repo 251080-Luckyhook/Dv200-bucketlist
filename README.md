@@ -12,8 +12,6 @@
 
 A social web app where you do not plan a bucket list — you stamp the adventures you have already had.
 
-![Bucket List Memories passport mockup](img/passport-closed.png)
-
 [Explore the project](#about-the-project) · [View mockups](#mockups) · [Report Bug](#) · [Request Feature](#)
 
 ## Table of Contents
@@ -48,8 +46,6 @@ A social web app where you do not plan a bucket list — you stamp the adventure
 - [Acknowledgements](#acknowledgements)
 
 ## About the Project
-
-![Open passport mockup](img/passport-open.png)
 
 ### Project Description
 
@@ -216,15 +212,9 @@ Bucket List Memories became a functional social memory journal with a distinctiv
 
 ### Mockups
 
-![Closed passport mockup](img/passport-closed.png)
+![Bucket List Memories passport dashboard mockup](mockups/Firefly_Gemini%20Flash_pls%20put%20my%20screen%20on%20this%20img%20as%20a%20mockup%20517501.png)
 
-![Open passport mockup](img/passport-open.png)
-
-![Passport spread mockup](img/spread-2-3.png)
-
-![Passport cover spread mockup](img/spread-cover-1.png)
-
-![Passport final spread mockup](img/spread-6-cover.png)
+![Bucket List Memories login screen mockup](mockups/Firefly_Gemini%20Flash_pls%20do%20the%20same%20with%20these%20517501.png)
 
 ### Video Demonstration
 
