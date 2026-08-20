@@ -10,13 +10,81 @@
 }
 
 body {
+  position: relative;
+  overflow-x: hidden;
   background-color: var(--cream);
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
   color: #1a1a1a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-           /* Navbar  */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -18%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at 12% 35%, rgba(11, 61, 31, 0.8) 0%, transparent 42%),
+    radial-gradient(ellipse at 78% 28%, rgba(139, 191, 63, 0.72) 0%, transparent 38%),
+    radial-gradient(ellipse at 54% 82%, rgba(232, 169, 53, 0.55) 0%, transparent 40%),
+    linear-gradient(115deg, var(--cream), #d8e3b5 48%, #f3d991);
+  background-size: 135% 135%;
+  filter: blur(34px) saturate(115%);
+  opacity: 0.7;
+  animation: silkFlow 18s ease-in-out infinite alternate;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes silkFlow {
+  0% {
+    background-position: 0% 45%;
+    transform: scale(1) skewX(0deg);
+  }
+  50% {
+    background-position: 100% 55%;
+    transform: scale(1.08) skewX(-3deg);
+  }
+  100% {
+    background-position: 35% 40%;
+    transform: scale(1.02) skewX(3deg);
+  }
+}
+
+.site-footer {
+  margin-top: auto;
+  padding: 18px 32px;
+  background: linear-gradient(to left, var(--green-dark) 0%, var(--green-mid) 55%, var(--green-light) 100%);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9rem;
+  box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.18);
+}
+
+.site-footer-inner {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 576px) {
+  .site-footer-inner {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+ /* Navbar  */
 .site-navbar {
+  position: relative;
+  z-index: 100;
   background: linear-gradient(90deg, var(--green-dark) 0%, var(--green-mid) 55%, var(--green-light) 100%);
   padding: 18px 32px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25);
@@ -66,8 +134,47 @@ body {
   justify-content: center;
   font-weight: 700;
 }
+.account-menu {
+  position: relative;
+  z-index: 101;
+}
+.account-menu .avatar-circle {
+  border: 0;
+  cursor: pointer;
+}
+.account-popup {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: grid;
+  gap: 8px;
+  min-width: 150px;
+  padding: 10px;
+  border: 1px solid #1a1a1a;
+  border-radius: 4px;
+  background: #fff;
+  visibility: hidden;
+}
+.account-popup[data-open] {
+  pointer-events: auto;
+  visibility: visible;
+}
+.account-popup span {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+}
+.account-popup .btn {
+  width: 100%;
+  padding: 5px 8px;
+  border-radius: 4px;
+}
 
-/* ---------- Buttons / pills ---------- */
+.account-popup form {
+  margin: 0;
+}
+
+/* -- Buttons -- */
 .btn-pill-gold {
   background-color: var(--gold);
   border: none;
@@ -100,52 +207,94 @@ body {
   margin-bottom: 8px;
 }
 
-/* ---------- Cards (Community Feed) ---------- */
+/* -- Cards (Feed) -- */
 .filters-panel {
   min-height: 100%;
   padding: 30px 40px;
+  display: flex;
 }
 
 .filters-card {
-  background-color: #fffed3;
-  border-radius: var(--card-radius);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-  padding: 20px 24px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: linear-gradient(90deg, var(--green-dark), var(--green-light));
+  border: 3px solid var(--gold);
+  border-radius: 20px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  padding: 32px 28px;
+  cursor: default;
+  width: 100%;
+  min-height: 620px;
 }
 
 .filters-panel h6 {
+  position: relative;
   font-weight: 700;
   text-transform: none;
   margin-top: 24px;
-  margin-bottom: 35px;
+  margin-bottom: 28px;
+  color: #fff;
+}
+
+.filters-panel h6:first-child {
+  margin-top: 0;
+}
+
+.filters-panel h6:not(:first-child) {
+  padding-top: 32px;
+  margin-top: 36px;
+}
+
+.filters-panel h6:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: clamp(16px, 0.2cm, 40px);
+  right: clamp(16px, 0.2cm, 40px);
+  border-top: 2px solid rgba(255, 255, 255, 0.65);
 }
 
 .filter-check {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  width: 100%;
+  margin-bottom: 14px;
+  color: #fff;
+  cursor: pointer;
+  user-select: none;
 }
 
 .filter-check .box {
   width: 22px;
   height: 22px;
   border-radius: 5px;
-  border: 2px solid var(--green-dark);
+  border: 2px solid var(--gold);
   margin-right: 10px;
   display: inline-block;
 }
 
 .filter-check.checked .box {
-  background-color: var(--green-dark);
+  background-color: var(--gold);
 }
 
-/* Flex containers for Year and Category pills to avoid squishing */
+.filter-check span:last-child {
+  margin-left: auto;
+  text-align: right;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.9rem;
+}
+
+.year-pill,
+.category-pill {
+  cursor: pointer;
+  user-select: none;
+  border: none;
+}
+
+/* containers for Year and Category (avoid squishing) */
 .filters-panel h6 + div {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 14px;
 }
 
 .year-pill {
@@ -189,6 +338,24 @@ body {
 .memory-card .cover {
   height: 160px;
   position: relative;
+  overflow: hidden;
+}
+
+.card-cover-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.memory-card .cover.has-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(15, 65, 35, 0.28);
 }
 
 .memory-card .cover .badge-stamp {
@@ -207,6 +374,7 @@ body {
   font-weight: 700;
   color: rgba(0, 0, 0, 0.6);
   background: rgba(255, 255, 255, 0.15);
+  z-index: 2;
 }
 
 .memory-card .cover .card-title-overlay {
@@ -216,6 +384,7 @@ body {
   color: #fff;
   font-weight: 600;
   font-size: 1.1rem;
+  z-index: 2;
 }
 
 .memory-card .card-body-custom {
@@ -240,14 +409,18 @@ body {
   color: #444;
 }
 
-/* Cover color variants */
-.cover-red { background-color: #e8615a; }
+/* --Cover color variants-- */
+.cover-red { background-color: #d9b83f; }
 .cover-green { background-color: #4caf50; }
-.cover-cyan { background-color: #32c65c; }
-.cover-orange { background-color: #c9822c; }
-.cover-darkgreen { background-color: #0b3d1f; }
+.cover-cyan { background-color: #75b85a; }
+.cover-orange { background-color: #e2c85b; }
+.cover-darkgreen { background-color: #236b3c; }
+.cover-yellow { background-color: #e4c84f; }
+.cover-yellow-light { background-color: #f1df83; }
+.cover-green-light { background-color: #8fca70; }
 
-/* ---------- Forms (Add Memory) ---------- */
+
+/* -- Forms (Add Memory) -- */
 .form-pill-input {
   border-radius: 30px;
   border: 2px solid #1a1a1a;
@@ -270,13 +443,68 @@ body {
   color: #137844;
 }
 
+.media-dropzone {
+  min-height: 160px;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.media-dropzone small {
+  color: #666;
+}
+
+.media-dropzone.dragover {
+  border-color: #137844;
+  background-color: #d4f0df;
+}
+
+.media-preview {
+  min-height: 160px;
+  overflow: hidden;
+  padding: 8px;
+  color: #666;
+  text-align: center;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.media-preview-content {
+  max-width: 100%;
+}
+
+.media-preview-content {
+  width: 100%;
+  height: 144px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.media-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.media-controls .btn {
+  padding: 4px 10px;
+}
+
+.media-controls span {
+  min-width: 42px;
+}
+
 .form-label-strong {
   font-weight: 700;
   margin-bottom: 8px;
   display: block;
 }
 
-/* ---------- Votes page ---------- */
+/* -- Votes page -- */
 .vote-card {
   border: 2px solid #1a1a1a;
   border-radius: 20px;
@@ -327,13 +555,14 @@ body {
   border-bottom: 1px solid rgba(76, 226, 151, 0.2);
 }
 
-/* ---------- Memory detail page ---------- */
+/* -- Memory detail page -- */
 .memory-page-card {
   background: linear-gradient(90deg, var(--green-dark), var(--green-light));
   border: 3px solid var(--gold);
   border-radius: 20px;
+  width: calc(100% - 32px);
   max-width: 1100px;
-  margin: -60px auto 60px auto;
+  margin: 30px auto 60px auto;
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
@@ -345,6 +574,27 @@ body {
   position: relative;
   padding: 40px;
   color: #fff;
+}
+
+.detail-hero.has-hero-media {
+  isolation: isolate;
+}
+
+.detail-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-hero.has-hero-media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(135deg, rgba(11, 61, 31, 0.78), rgba(228, 200, 79, 0.3));
 }
 
 .detail-hero .stamp-circle {
@@ -362,6 +612,7 @@ body {
   font-size: 0.75rem;
   font-weight: 700;
   transform: rotate(15deg);
+  z-index: 2;
 }
 
 .detail-hero h1 {
@@ -370,6 +621,7 @@ body {
   left: 40px;
   font-weight: 600;
   margin: 0;
+  z-index: 2;
 }
 
 .detail-hero .meta-line {
@@ -378,12 +630,121 @@ body {
   left: 40px;
   font-size: 0.95rem;
   color: rgba(255, 255, 255, 0.85);
+  z-index: 2;
 }
 
 .detail-body {
   padding: 30px 40px;
   background-color: rgba(255, 255, 255, 0.96);
   color: #1a1a1a;
+}
+
+@media (max-width: 576px) {
+  .memory-page-card {
+    width: calc(100% - 20px);
+    margin-top: 20px;
+  }
+
+  .detail-hero {
+    min-height: 300px;
+    padding: 24px;
+  }
+
+  .detail-hero h1 {
+    left: 24px;
+    right: 24px;
+    bottom: 48px;
+    font-size: 1.6rem;
+  }
+
+  .detail-hero .meta-line {
+    left: 24px;
+    right: 24px;
+    font-size: 0.8rem;
+  }
+
+  .detail-body {
+    padding: 24px 18px;
+  }
+}
+
+.memory-detail-media img,
+.memory-detail-media video {
+  display: block;
+  width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+  border-radius: 12px;
+  background-color: #e2e2e2;
+}
+
+.memory-detail-media audio {
+  width: 100%;
+}
+
+.detail-media-item:not([data-active]) {
+  display: none;
+}
+
+.detail-media-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.detail-media-controls .btn {
+  padding: 4px 12px;
+}
+
+.next-adventure-voting {
+  display: grid;
+  gap: 10px;
+}
+
+.next-adventure-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 2px solid #1a1a1a;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.next-adventure-option span {
+  flex: 1;
+}
+
+.next-adventure-option input:disabled + span {
+  color: #777;
+}
+
+.comment-form {
+  max-width: 700px;
+}
+
+.memory-like-form {
+  margin: 0;
+}
+
+.memory-like-button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #1a1a1a;
+  font: inherit;
+  cursor: pointer;
+}
+
+.memory-like-button:hover {
+  color: #b33b32;
+}
+
+.memory-like-button:disabled {
+  color: #b33b32;
+  cursor: default;
 }
 
 .comment-box {
@@ -407,7 +768,315 @@ body {
   flex-shrink: 0;
 }
 
-/* ---------- Login page ---------- */
+.admin-memory-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid rgba(26, 26, 26, 0.2);
+}
+
+.admin-memory-link {
+  flex: 1;
+  color: inherit;
+  text-decoration: none;
+}
+
+.admin-memory-link:hover strong {
+  text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+  .admin-memory-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+/* -- Page card -- */
+.page-card {
+  background: linear-gradient(90deg, var(--green-dark), var(--green-light));
+  border: 3px solid var(--gold);
+  border-radius: 20px;
+  padding: 40px;
+  max-width: 1100px;
+  margin: 40px auto 60px auto;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  color: #fff;
+}
+
+.page-card h1,
+.page-card h4,
+.page-card h5,
+.page-card h6 {
+  color: #fff;
+}
+
+.page-card .text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.page-card .form-label-strong,
+.page-card .form-check-label {
+  color: #fff;
+}
+
+/* Add a gold border to the inner panels */
+.page-card .prev-adventures-panel {
+  border: 2px solid var(--gold);
+}
+
+/* Use dark text for components inside the page card */
+.page-card .vote-card,
+.page-card .vote-card h5,
+.page-card .vote-card span {
+  color: #1a1a1a;
+}
+
+/* -- Passport page ( flip-book) -- */
+.passport-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px 20px 80px;
+  gap: 18px;
+}
+
+.passport-layout {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 120px;
+  width: min(100%, 1600px);
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.passport-book {
+  position: relative;
+  width: clamp(240px, 34vw, 300px);
+  height: clamp(344px, 49vw, 430px);
+  perspective: 1800px;
+  transform-style: preserve-3d;
+  transition: width 0.9s cubic-bezier(0.65, 0, 0.35, 1),
+              height 0.9s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.passport-book.open {
+  width: clamp(320px, 46vw, 480px);
+  height: clamp(230px, 33vw, 345px);
+}
+
+/* Cover */
+.passport-cover {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transition: transform 1s cubic-bezier(0.65, 0, 0.35, 1);
+  z-index: 3;
+}
+
+.passport-book.open .passport-cover {
+  transform: rotateY(-150deg);
+  pointer-events: none;
+}
+
+.passport-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  backface-visibility: hidden;
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, 0.45));
+}
+
+.passport-name {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, 0);
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  font-size: 0.85rem;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  white-space: nowrap;
+  backface-visibility: hidden;
+}
+
+/* Open pages */
+.passport-pages {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.94);
+  transition: opacity 0.5s ease 0.35s, transform 0.5s ease 0.35s;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.passport-book.open .passport-pages {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.page-spread {
+  width: 100%;
+  position: relative;
+}
+
+.page-spread img {
+  width: 100%;
+  display: block;
+  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.4));
+  transform-origin: left center;
+  backface-visibility: hidden;
+  transition: transform 0.26s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.26s ease;
+}
+
+.page-spread img.flipping {
+  transform: rotateY(-150deg);
+  opacity: 0.4;
+}
+
+@keyframes pageNudge {
+  0%   { transform: translateX(0); }
+  30%  { transform: translateX(10px); }
+  60%  { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+.page-spread img.nudge {
+  animation: pageNudge 0.4s ease;
+}
+
+.passport-stamps {
+  position: absolute;
+  inset: 8% 4% 8%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8%;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.passport-stamp-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.passport-stamp-page > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 8px;
+  flex: 1;
+}
+
+.passport-add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  min-height: 360px;
+  padding: 24px 30px;
+  border: 2px dashed #1a1a1a;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #1a1a1a;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.passport-add-card:hover {
+  background: #fff;
+  color: var(--green-dark);
+}
+
+.passport-stamp {
+  position: relative;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  min-height: 48px;
+  margin: 0 auto;
+  padding: 5px;
+  border: 2px solid rgba(32, 91, 132, 0.7);
+  border-radius: 50%;
+  background: rgba(232, 169, 53, 0.72);
+  color: #173f59;
+  text-align: center;
+  text-decoration: none;
+  transform: rotate(-5deg);
+  pointer-events: auto;
+}
+
+.passport-stamp:nth-child(even) {
+  background: rgba(139, 191, 63, 0.72);
+  transform: rotate(5deg);
+}
+
+.passport-stamp:hover {
+  color: #173f59;
+  transform: scale(1.06) rotate(0);
+}
+
+.passport-stamp strong,
+.passport-stamp small {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passport-stamp strong {
+  font-size: 0.62rem;
+}
+
+.passport-stamp small {
+  font-size: 0.48rem;
+}
+
+.page-zone {
+  position: absolute;
+  inset: 0;
+  width: 50%;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.page-zone-right {
+  left: 50%;
+}
+
+.passport-hint {
+  position: relative;
+  z-index: 10;
+  margin: 0;
+  padding: 6px 12px;
+  background: rgba(239, 233, 216, 0.9);
+  color: rgba(26, 26, 26, 0.65);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* -- Login page -- */
 .hero-login {
   background: linear-gradient(90deg, var(--green-dark), var(--green-light));
   padding: 60px 40px;
@@ -469,4 +1138,18 @@ body {
 .login-card .fine-print a {
   color: #fff;
   font-weight: 700;
+}
+
+@media (max-width: 700px) {
+  .passport-layout {
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  .passport-add-card {
+    width: 88px;
+    min-height: 70px;
+    padding: 9px;
+    font-size: 0.75rem;
+  }
 }
