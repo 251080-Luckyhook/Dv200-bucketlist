@@ -22,6 +22,7 @@ A social web app where you do not plan a bucket list — you stamp the adventure
 - [Getting Started](#getting-started)
 - [Prerequisites](#prerequisites)
 - [How to install](#how-to-install)
+- [Start the application](#start-the-application)
 - [Features and Functionality](#features-and-functionality)
 - [Concept Process](#concept-process)
 - [Ideation](#ideation)
@@ -84,11 +85,9 @@ Install the following:
    C:\xampp\htdocs\Dv200-bucketlist
    ```
 
-2. Open the XAMPP Control Panel and start **Apache** and **MySQL**.
+2. Open [phpMyAdmin](http://localhost/phpmyadmin), select the **Import** tab, and import [`schema.sql`](schema.sql). The script creates the `bucketlist_memories` database and its tables.
 
-3. Open [phpMyAdmin](http://localhost/phpmyadmin), select the **Import** tab, and import [`schema.sql`](schema.sql). The script creates the `bucketlist_memories` database and its tables.
-
-4. Check the database credentials in [`db.php`](db.php). The default local configuration is:
+3. Check the database credentials in [`db.php`](db.php). The default local configuration is:
 
    ```php
    DB_HOST = '127.0.0.1';
@@ -97,9 +96,11 @@ Install the following:
    DB_PASS = '';
    ```
 
-5. Open the application at [http://localhost/Dv200-bucketlist/index.php](http://localhost/Dv200-bucketlist/index.php).
+### Start the application
 
-6. Create an account. A user named `admin` is treated as the moderator account and can approve or reject submitted memories from the Admin page.
+1. Open the XAMPP Control Panel and start **Apache** and **MySQL**.
+2. Visit [http://localhost/Dv200-bucketlist/](http://localhost/Dv200-bucketlist/) in your browser.
+3. Create an account. A user named `admin` is treated as the moderator account and can approve or reject submitted memories from the Admin page.
 
 New memories are submitted as `pending`, so they must be approved before they appear in the public feed.
 
