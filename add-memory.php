@@ -1,8 +1,12 @@
 <?php
 require_once __DIR__ . '/auth.php';
+// You need to be logged in to add a memory.
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // The form sends its answers here. This code checks them, saves the memory, then returns to the feed.
+  // There is no CSRF token here yet. Login alone does not stop another site submitting this form.
+  // These checks run on the server too, so they still work if browser checks are bypassed.
   $title = trim($_POST['title'] ?? '');
   $country = trim($_POST['country'] ?? '');
   $year = trim($_POST['year'] ?? 'Earlier');
@@ -12,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($title === '' || $country === '' || $story === '') {
     $formError = 'Please complete the title, country, and story before stamping your memory.';
   } else {
+    // The page asks for something already done, but this code does not check that the year is in the past.
     $memoryId = bin2hex(random_bytes(8));
     $media = [];
     $uploadDirectory = __DIR__ . '/uploads';
@@ -27,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (!empty($_FILES['media']['name'][0])) {
+      // Only these file types are accepted, and each upload gets a new filename.
+      // This code does not set its own file-size limit.
       $fileInfo = new finfo(FILEINFO_MIME_TYPE);
       foreach ($_FILES['media']['tmp_name'] as $index => $temporaryFile) {
         if ($_FILES['media']['error'][$index] !== UPLOAD_ERR_OK) continue;
@@ -44,8 +51,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $nextAdventures = array_values(array_filter(array_map('trim', $_POST['next_adventures'] ?? [])));
     $coverVariants = ['cover-yellow', 'cover-yellow-light', 'cover-green', 'cover-green-light'];
     $pdo = db();
+    // Save the memory and its related database rows together. Uploaded files are saved separately.
     $pdo->beginTransaction();
     $memoryStatement = $pdo->prepare('INSERT INTO memories (user_id, title, country, year_completed, category, story, visible, status, cover) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+    // New memories wait for an admin to approve or reject them.
     $memoryStatement->execute([currentUser()['id'], $title, $country, $year, $category, $story, isset($_POST['visible']) ? 1 : 0, 'pending', $coverVariants[random_int(0, count($coverVariants) - 1)]]);
     $databaseMemoryId = $pdo->lastInsertId();
 
@@ -54,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $mediaStatement->execute([$databaseMemoryId, $mediaPath, pathinfo($mediaPath, PATHINFO_EXTENSION)]);
     }
 
+    // Reuse an existing tag name if possible, then connect it to this memory.
     $tagStatement = $pdo->prepare('INSERT INTO tags (name) VALUES (?) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id)');
     $memoryTagStatement = $pdo->prepare('INSERT IGNORE INTO memory_tags (memory_id, tag_id) VALUES (?, LAST_INSERT_ID())');
     foreach (array_values(array_filter(array_map('trim', explode(',', $_POST['tags'] ?? '')))) as $tag) {
@@ -276,6 +286,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     const closeTagModal = document.getElementById('closeTagModal');
     const tagsInput = document.getElementById('tagsInput');
 
+    // Updates the tag button and the list that gets sent with the form.
     function updateTagButton() {
       const count = tagContainer.querySelectorAll('.tag-item').length;
       addTagButton.disabled = count >= MAX_TAGS;
@@ -285,6 +296,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .join(',');
     }
 
+    // Opens the window for adding a tag.
     function openTagModal() {
       if (tagContainer.querySelectorAll('.tag-item').length >= MAX_TAGS) {
         alert('You can add up to 5 tags only.');
@@ -297,12 +309,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       setTimeout(() => tagInput.focus(), 50);
     }
 
+    // Closes the tag window and clears its text box.
     function closeTagModalDialog() {
       tagModal.classList.add('hidden');
       tagModal.setAttribute('aria-hidden', 'true');
       tagInput.value = '';
     }
 
+    // Adds a tag if it is not blank, repeated, or over the five-tag limit.
     function addTag(tagText) {
       const trimmed = tagText.trim();
       if (!trimmed) return;
@@ -389,11 +403,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     let currentMediaIndex = 0;
     let currentPreviewUrl = '';
 
+    // Checks whether a file is one of the allowed types.
     function isAllowedMedia(file) {
       const extension = file.name.split('.').pop().toLowerCase();
       return allowedMediaTypes.has(file.type) || allowedMediaExtensions.has(extension);
     }
 
+    // Shows a preview of the selected file.
     function showMediaPreview() {
       const file = uploadedMedia[currentMediaIndex];
       if (!file) {
@@ -428,6 +444,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       nextMedia.disabled = uploadedMedia.length < 2;
     }
 
+    // Adds allowed files to the list and refreshes the preview.
     function handleMediaFiles(files) {
       const selectedFiles = Array.from(files);
       const validFiles = selectedFiles.filter(isAllowedMedia);
@@ -447,6 +464,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       fileLabel.textContent = `${uploadedMedia.length} file${uploadedMedia.length === 1 ? '' : 's'} selected`;
     }
 
+    // Puts the selected files into the form so they are uploaded when submitted.
     function updateMediaInput() {
       const fileList = new DataTransfer();
       uploadedMedia.forEach((file) => fileList.items.add(file));

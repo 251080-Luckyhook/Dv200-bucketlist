@@ -1,8 +1,11 @@
 <?php
 require_once __DIR__ . '/auth.php';
+// Only admins can open this page, even if they type its address directly.
 requireAdmin();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // Approve and reject change the status. Remove deletes the memory for good.
+  // These forms do not have a CSRF token yet.
   $deleteId = $_POST['delete_id'] ?? '';
   $approveId = $_POST['approve_id'] ?? '';
   $rejectId = $_POST['reject_id'] ?? '';
@@ -22,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $memory = getMemoryForAdmin($deleteId);
   if ($memory) {
 
+    // Remove uploaded files too. Deleting the memory also deletes its related database rows.
     foreach ($memory['media'] as $mediaPath) {
       $fullPath = __DIR__ . '/' . ltrim($mediaPath, '/');
       if (is_file($fullPath)) unlink($fullPath);
@@ -33,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   exit;
 }
 
+// Makes text safe to show on the page.
 function escapeOutput($value) {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }

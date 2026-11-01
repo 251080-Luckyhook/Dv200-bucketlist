@@ -1,8 +1,10 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// Get the public memories first; PHP uses them to build the page below.
 $memories = getVisibleMemories();
 
+// Makes saved text safe to show on the page.
 function escapeOutput($value) {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
@@ -139,11 +141,15 @@ function escapeOutput($value) {
   <?php include __DIR__ . '/footer.php'; ?>
 
   <script>
+    // The memories are already on the page, so these filters hide or show cards in the browser.
+    // They do not ask the database for a new filtered list.
+    // Turns a country filter on or off.
     function toggleCountry(el) {
       el.classList.toggle('checked');
       applyFilters();
     }
 
+    // Makes the country filter options from the memories on the page.
     function buildCountryFilters() {
       const countryFilters = document.getElementById('countryFilters');
       const countryCounts = new Map();
@@ -171,6 +177,7 @@ function escapeOutput($value) {
       });
     }
 
+    // Selects a year and updates which memories are shown.
     function selectYear(el) {
       const wasActive = el.classList.contains('active');
       document.querySelectorAll('.year-pill').forEach(p => p.classList.remove('active'));
@@ -178,11 +185,13 @@ function escapeOutput($value) {
       applyFilters();
     }
 
+    // Turns a category filter on or off.
     function toggleCategory(el) {
       el.classList.toggle('active');
       applyFilters();
     }
 
+    // Shows only memories that match the selected filters.
     function applyFilters() {
       const selectedCountries = Array.from(document.querySelectorAll('.filter-check.checked'))
         .map(el => el.dataset.country);

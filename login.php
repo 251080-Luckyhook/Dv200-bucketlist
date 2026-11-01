@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// Already signed-in users can go straight to the feed.
 if (currentUser()) {
   header('Location: index.php');
   exit;
@@ -11,9 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'] ?? '';
   $user = userByUsername($username);
 
+  // Compare the password with the scrambled version saved for this account.
   if (!$user || !password_verify($password, $user['password_hash'])) {
     $formError = 'The username or password is incorrect.';
   } else {
+    // Save the username so the site remembers who signed in.
     $_SESSION['current_user'] = $username;
     header('Location: index.php');
     exit;

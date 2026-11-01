@@ -1,10 +1,12 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// Makes text safe to show on the page.
 function escapeOutput($value) {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
+// Keep approved memories that have adventure ideas to vote on.
 $memories = array_values(array_filter(getVisibleMemories(), function ($memory) {
   return (!isset($memory['visible']) || $memory['visible']) && !empty($memory['next_adventures']);
 }));

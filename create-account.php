@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// If the user is already signed in, send them back to the feed.
 if (currentUser()) {
   header('Location: index.php');
   exit;
@@ -11,6 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password = $_POST['password'] ?? '';
   $username = trim($_POST['username'] ?? '');
 
+  // Check the answers here as well as in the form.
   if (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '' || $username === '') {
     $formError = 'Please enter a valid email, password, and username.';
   } elseif (userByUsername($username)) {
@@ -22,8 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($emailCheck->fetch()) {
       $formError = 'That email is already registered.';
     } else {
+      // PHP hashes the password before saving it; the original is never stored.
       $statement = db()->prepare('INSERT INTO users (username, email, password_hash, is_admin) VALUES (?, ?, ?, ?)');
+      // Right now, choosing the username "admin" gives the account admin access.
       $statement->execute([$usernameKey, $email, password_hash($password, PASSWORD_DEFAULT), $usernameKey === 'admin' ? 1 : 0]);
+      // Remember the username so the new account is signed in on the next page.
       $_SESSION['current_user'] = $usernameKey;
       header('Location: index.php');
       exit;

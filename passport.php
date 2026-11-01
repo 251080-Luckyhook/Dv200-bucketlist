@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// Show this user's approved memories in their passport, three per page spread.
 $passportMemories = array_values(array_filter(getVisibleMemories(), function ($memory) {
   if (isset($memory['visible']) && !$memory['visible']) return false;
   if (!currentUser()) return true;
@@ -115,6 +116,7 @@ $passportStampPages = [
     const stampRight = document.getElementById('passportStampRight');
     const passportStampPages = <?php echo json_encode($passportStampPages, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>;
 
+    // Makes a stamp that opens the memory.
     function createStamp(memory) {
       const stamp = document.createElement('a');
       stamp.className = 'passport-stamp';
@@ -129,6 +131,7 @@ $passportStampPages = [
       return stamp;
     }
 
+    // Puts the stamps on the left and right pages.
     function renderStamps(index) {
       stampLeft.replaceChildren();
       stampRight.replaceChildren();
@@ -137,10 +140,12 @@ $passportStampPages = [
       spreadStamps.right.forEach((memory) => stampRight.appendChild(createStamp(memory)));
     }
 
+    // Checks if the passport is open.
     function isOpen() {
       return book.classList.contains('open');
     }
 
+    // Opens the passport at the first page.
     function openPassport() {
       if (book.classList.contains('open')) return;
       spreadIndex = 0;
@@ -150,6 +155,7 @@ $passportStampPages = [
       updateHint();
     }
 
+    // Closes the passport and turns back to the cover.
     function closePassport() {
       book.classList.remove('open');
       spreadIndex = 0;
@@ -158,6 +164,7 @@ $passportStampPages = [
       updateHint();
     }
 
+    // Turns to another page.
     function goToSpread(index) {
       pageImg.classList.add('flipping');
       window.setTimeout(() => {
@@ -169,6 +176,7 @@ $passportStampPages = [
       }, 260);
     }
 
+    // Changes the hint to match the page the user is viewing.
     function updateHint() {
       if (!isOpen()) {
         hint.textContent = 'Click the passport to open it';
@@ -179,6 +187,7 @@ $passportStampPages = [
       }
     }
 
+    // Gives the page a small shake when there are no more pages.
     function nudgePage() {
       pageImg.classList.remove('nudge');
       void pageImg.offsetWidth; // restart animation

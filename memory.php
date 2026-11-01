@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/auth.php';
 
+// Makes text safe to show on the page.
 function escapeOutput($value) {
   return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
@@ -9,8 +10,12 @@ $memoryId = $_GET['id'] ?? '';
 $actionMessage = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // You need to be signed in to like, comment, or vote.
+  // These forms do not have a CSRF token yet.
   requireLogin();
   if (isset($_POST['like_memory'])) {
+    // The database stops the same person liking the same memory twice.
+    // Then the displayed total is counted again from the likes list.
     $like = db()->prepare('INSERT IGNORE INTO likes (memory_id, user_id) VALUES (?, ?)');
     $like->execute([$memoryId, currentUser()['id']]);
     db()->prepare('UPDATE memories SET likes = (SELECT COUNT(*) FROM likes WHERE memory_id = ?) WHERE id = ?')->execute([$memoryId, $memoryId]);
@@ -20,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if (isset($_POST['comment'])) {
+    // Save the comment with the memory and the name of the person who wrote it.
+    // The text is made safe before it is shown on the page.
     $commentText = trim($_POST['comment']);
     if ($commentText !== '') {
       db()->prepare('INSERT INTO comments (memory_id, user_id, body) VALUES (?, ?, ?)')->execute([$memoryId, currentUser()['id'], $commentText]);
@@ -29,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if (isset($_POST['vote_adventure'])) {
+    // Check that the selected adventure number is a whole number before looking it up.
     $voteIndex = filter_var($_POST['vote_adventure'], FILTER_VALIDATE_INT);
     $adventureId = false;
     if ($voteIndex !== false && $voteIndex >= 0) {
@@ -39,11 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($adventureId) {
       $pdo = db();
       try {
+        // Save the vote and update its total together.
+        // The database also stops a person voting twice on the same memory.
         $pdo->beginTransaction();
         $pdo->prepare('INSERT INTO votes (memory_id, adventure_id, user_id) VALUES (?, ?, ?)')->execute([$memoryId, $adventureId, currentUser()['id']]);
         $pdo->prepare('UPDATE next_adventures SET vote_count = vote_count + 1 WHERE id = ?')->execute([$adventureId]);
         $pdo->commit();
       } catch (PDOException $exception) {
+        // If saving the vote fails, undo the changes. The page does not show the error yet.
         if ($pdo->inTransaction()) $pdo->rollBack();
       }
     }
@@ -53,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
+// Admins can see any memory. Everyone else only sees approved public memories.
 $memory = isAdmin() ? getMemoryForAdmin($memoryId) : getMemoryById($memoryId);
 
 if ($memory === null) {
@@ -228,6 +240,7 @@ foreach ($mediaFiles as $mediaPath) {
       const detailMediaCounter = document.getElementById('detailMediaCounter');
       let detailMediaIndex = 0;
 
+      // Shows the next or previous photo, video, or audio file.
       function showDetailMedia(index) {
         detailMediaIndex = (index + detailMediaItems.length) % detailMediaItems.length;
         detailMediaItems.forEach((item, itemIndex) => {

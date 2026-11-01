@@ -1,14 +1,17 @@
 <?php
+// Database settings for local development. Use private settings for a live site.
 const DB_HOST = '127.0.0.1';
 const DB_NAME = 'bucketlist_memories';
 const DB_USER = 'root';
 const DB_PASS = '';
 
+// Opens the database connection once and reuses it.
 function db() {
   static $pdo;
   if ($pdo instanceof PDO) return $pdo;
 
   try {
+    // PDO connects PHP to MySQL and lets us run prepared queries.
     $pdo = new PDO(
       'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
       DB_USER,
@@ -22,7 +25,10 @@ function db() {
   return $pdo;
 }
 
+// Gets memories that are approved and set to be visible.
 function getVisibleMemories() {
+  // Match each memory with its author. Memories without a matching account are left out.
+  // Only approved, visible memories are shown to everyone.
   $statement = db()->query(
     "SELECT m.*, u.username AS author
      FROM memories m
@@ -33,7 +39,9 @@ function getVisibleMemories() {
   return array_map('hydrateMemory', $statement->fetchAll());
 }
 
+// Gets one approved, visible memory for its detail page.
 function getMemoryById($id) {
+  // Apply the same rules as the public feed.
   $statement = db()->prepare(
     "SELECT m.*, u.username AS author
      FROM memories m JOIN users u ON u.id = m.user_id
@@ -44,7 +52,9 @@ function getMemoryById($id) {
   return $memory ? hydrateMemory($memory) : null;
 }
 
+// Gets all memories so the admin can review them.
 function getAllMemories() {
+  // Include pending, approved, and rejected memories.
   $statement = db()->query(
     "SELECT m.*, u.username AS author
      FROM memories m JOIN users u ON u.id = m.user_id
@@ -53,6 +63,7 @@ function getAllMemories() {
   return array_map('hydrateMemory', $statement->fetchAll());
 }
 
+// Gets one memory for the admin, even if it is not approved.
 function getMemoryForAdmin($id) {
   $statement = db()->prepare(
     "SELECT m.*, u.username AS author
@@ -64,12 +75,15 @@ function getMemoryForAdmin($id) {
   return $memory ? hydrateMemory($memory) : null;
 }
 
+// Adds a memory's photos, tags, adventure ideas, votes, and comments to its details.
 function hydrateMemory($memory) {
   $pdo = db();
+  // These details are saved in their own tables and connected to the memory by its ID.
   $media = $pdo->prepare('SELECT path FROM memory_media WHERE memory_id = ? ORDER BY id');
   $media->execute([$memory['id']]);
   $memory['media'] = array_column($media->fetchAll(), 'path');
 
+  // The link table tells us which tags belong to this memory.
   $tags = $pdo->prepare('SELECT t.name FROM tags t JOIN memory_tags mt ON mt.tag_id = t.id WHERE mt.memory_id = ? ORDER BY t.name');
   $tags->execute([$memory['id']]);
   $memory['tags'] = array_column($tags->fetchAll(), 'name');
@@ -91,7 +105,9 @@ function hydrateMemory($memory) {
   return $memory;
 }
 
+// Finds an account by username.
 function userByUsername($username) {
+  // The question mark safely inserts the username into the query.
   $statement = db()->prepare('SELECT * FROM users WHERE username = ?');
   $statement->execute([strtolower($username)]);
   return $statement->fetch() ?: null;
